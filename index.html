@@ -6,135 +6,138 @@
     <title>Document</title>
 </head>
 <body>
-const canvas = document.getElementById("gameCanvas");
-const ctx = canvas.getContext("2d");
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Jogo de Coleta de Lixo</title>
+    <style>
+        canvas {
+            border: 2px solid black;
+            background-color: #f0f0f0;
+        }
+        #hud {
+            font-family: sans-serif;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
 
-let score = 0;
-let time = 60;
+<div id="hud">
+    <p id="score">Pontuação: 0</p>
+    <p id="timer">Tempo: 60</p>
+</div>
 
-const player = {
-    x: 370,
-    y: 220,
-    width: 50,
-    height: 50,
-    speed: 5
-};
+<canvas id="gameCanvas" width="800" height="500"></canvas>
 
-const trash = {
-    x: Math.random() * 750,
-    y: Math.random() * 450,
-    size: 30
-};
+<script>
+window.onload = () => {
 
-const keys = {};
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
 
-document.addEventListener("keydown", e => {
-    keys[e.key] = true;
-});
+    let score = 0;
+    let time = 60;
 
-document.addEventListener("keyup", e => {
-    keys[e.key] = false;
-});
+    const player = {
+        x: 370,
+        y: 220,
+        width: 50,
+        height: 50,
+        speed: 5
+    };
 
-function movePlayer() {
+    const trash = {
+        x: Math.random() * (canvas.width - 30),
+        y: Math.random() * (canvas.height - 30),
+        size: 30
+    };
 
-    if(keys["ArrowUp"] || keys["w"])
-        player.y -= player.speed;
+    const keys = {};
 
-    if(keys["ArrowDown"] || keys["s"])
-        player.y += player.speed;
+    document.addEventListener("keydown", e => keys[e.key] = true);
+    document.addEventListener("keyup", e => keys[e.key] = false);
 
-    if(keys["ArrowLeft"] || keys["a"])
-        player.x -= player.speed;
+    function movePlayer() {
+        if(keys["ArrowUp"] || keys["w"] || keys["W"]) player.y -= player.speed;
+        if(keys["ArrowDown"] || keys["s"] || keys["S"]) player.y += player.speed;
+        if(keys["ArrowLeft"] || keys["a"] || keys["A"]) player.x -= player.speed;
+        if(keys["ArrowRight"] || keys["d"] || keys["D"]) player.x += player.speed;
 
-    if(keys["ArrowRight"] || keys["d"])
-        player.x += player.speed;
-
-    if(player.x < 0) player.x = 0;
-    if(player.y < 0) player.y = 0;
-    if(player.x > canvas.width - player.width)
-        player.x = canvas.width - player.width;
-
-    if(player.y > canvas.height - player.height)
-        player.y = canvas.height - player.height;
-}
-
-function collision() {
-
-    return (
-        player.x < trash.x + trash.size &&
-        player.x + player.width > trash.x &&
-        player.y < trash.y + trash.size &&
-        player.y + player.height > trash.y
-    );
-}
-
-function drawPlayer() {
-    ctx.fillStyle = "blue";
-    ctx.fillRect(
-        player.x,
-        player.y,
-        player.width,
-        player.height
-    );
-}
-
-function drawTrash() {
-    ctx.fillStyle = "brown";
-    ctx.fillRect(
-        trash.x,
-        trash.y,
-        trash.size,
-        trash.size
-    );
-}
-
-function update() {
-
-    movePlayer();
-
-    if(collision()) {
-        score++;
-
-        document.getElementById("score").textContent =
-            "Pontuação: " + score;
-
-        trash.x = Math.random() * 750;
-        trash.y = Math.random() * 450;
+        // Limites do canvas
+        if(player.x < 0) player.x = 0;
+        if(player.y < 0) player.y = 0;
+        if(player.x > canvas.width - player.width) player.x = canvas.width - player.width;
+        if(player.y > canvas.height - player.height) player.y = canvas.height - player.height;
     }
-}
 
-function draw() {
+    function collision() {
+        return (
+            player.x < trash.x + trash.size &&
+            player.x + player.width > trash.x &&
+            player.y < trash.y + trash.size &&
+            player.y + player.height > trash.y
+        );
+    }
 
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+    function repositionTrash() {
+        trash.x = Math.random() * (canvas.width - trash.size);
+        trash.y = Math.random() * (canvas.height - trash.size);
+    }
 
-    drawPlayer();
-    drawTrash();
-}
+    function drawPlayer() {
+        ctx.fillStyle = "blue";
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+    }
 
-function gameLoop() {
+    function drawTrash() {
+        ctx.fillStyle = "brown";
+        ctx.fillRect(trash.x, trash.y, trash.size, trash.size);
+    }
 
-    update();
-    draw();
+    function update() {
+        movePlayer();
 
-    if(time > 0){
+        if(collision()) {
+            score++;
+            document.getElementById("score").textContent = "Pontuação: " + score;
+            repositionTrash();
+        }
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawPlayer();
+        drawTrash();
+    }
+
+    function gameLoop() {
+        if(time <= 0) {
+            alert("Fim de jogo! Sua pontuação foi: " + score);
+            return;
+        }
+        update();
+        draw();
         requestAnimationFrame(gameLoop);
-    }else{
-        alert("Fim de jogo! Sua pontuação foi: " + score);
     }
-}
 
-setInterval(() => {
+    const timerInterval = setInterval(() => {
+        if(time > 0){
+            time--;
+            document.getElementById("timer").textContent = "Tempo: " + time;
+        } else {
+            clearInterval(timerInterval);
+        }
+    }, 1000);
 
-    time--;
+    gameLoop();
 
-    document.getElementById("timer").textContent =
-        "Tempo: " + time;
+};
+</script>
 
-},1000);
-
-gameLoop();
-
+</body>
+</html>
 
 
 
