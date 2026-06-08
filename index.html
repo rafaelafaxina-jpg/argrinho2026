@@ -6,7 +6,134 @@
     <title>Document</title>
 </head>
 <body>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
+let score = 0;
+let time = 60;
+
+const player = {
+    x: 370,
+    y: 220,
+    width: 50,
+    height: 50,
+    speed: 5
+};
+
+const trash = {
+    x: Math.random() * 750,
+    y: Math.random() * 450,
+    size: 30
+};
+
+const keys = {};
+
+document.addEventListener("keydown", e => {
+    keys[e.key] = true;
+});
+
+document.addEventListener("keyup", e => {
+    keys[e.key] = false;
+});
+
+function movePlayer() {
+
+    if(keys["ArrowUp"] || keys["w"])
+        player.y -= player.speed;
+
+    if(keys["ArrowDown"] || keys["s"])
+        player.y += player.speed;
+
+    if(keys["ArrowLeft"] || keys["a"])
+        player.x -= player.speed;
+
+    if(keys["ArrowRight"] || keys["d"])
+        player.x += player.speed;
+
+    if(player.x < 0) player.x = 0;
+    if(player.y < 0) player.y = 0;
+    if(player.x > canvas.width - player.width)
+        player.x = canvas.width - player.width;
+
+    if(player.y > canvas.height - player.height)
+        player.y = canvas.height - player.height;
+}
+
+function collision() {
+
+    return (
+        player.x < trash.x + trash.size &&
+        player.x + player.width > trash.x &&
+        player.y < trash.y + trash.size &&
+        player.y + player.height > trash.y
+    );
+}
+
+function drawPlayer() {
+    ctx.fillStyle = "blue";
+    ctx.fillRect(
+        player.x,
+        player.y,
+        player.width,
+        player.height
+    );
+}
+
+function drawTrash() {
+    ctx.fillStyle = "brown";
+    ctx.fillRect(
+        trash.x,
+        trash.y,
+        trash.size,
+        trash.size
+    );
+}
+
+function update() {
+
+    movePlayer();
+
+    if(collision()) {
+        score++;
+
+        document.getElementById("score").textContent =
+            "Pontuação: " + score;
+
+        trash.x = Math.random() * 750;
+        trash.y = Math.random() * 450;
+    }
+}
+
+function draw() {
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    drawPlayer();
+    drawTrash();
+}
+
+function gameLoop() {
+
+    update();
+    draw();
+
+    if(time > 0){
+        requestAnimationFrame(gameLoop);
+    }else{
+        alert("Fim de jogo! Sua pontuação foi: " + score);
+    }
+}
+
+setInterval(() => {
+
+    time--;
+
+    document.getElementById("timer").textContent =
+        "Tempo: " + time;
+
+},1000);
+
+gameLoop();
 
 
 
