@@ -1,149 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Jogo de Coleta de Lixo</title>
-    <style>
-        canvas {
-            border: 2px solid black;
-            background-color: #f0f0f0;
-        }
-        #hud {
-            font-family: sans-serif;
-            margin-bottom: 10px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agro Forte, Futuro Sustentável</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="hud">
-    <p id="score">Pontuação: 0</p>
-    <p id="timer">Tempo: 60</p>
-</div>
+    <h1>🌱 Agro Forte, Futuro Sustentável 🌱</h1>
 
-<canvas id="gameCanvas" width="800" height="500"></canvas>
+    <div class="info">
+        <p>Pontos: <span id="score">0</span></p>
+        <p>Tempo: <span id="time">30</span>s</p>
+    </div>
 
-<script>
-window.onload = () => {
+    <div id="game">
+        <div id="player">🚜</div>
+    </div>
 
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+    <button id="startBtn">Iniciar Jogo</button>
 
-    let score = 0;
-    let time = 60;
-
-    const player = {
-        x: 370,
-        y: 220,
-        width: 50,
-        height: 50,
-        speed: 5
-    };
-
-    const trash = {
-        x: Math.random() * (canvas.width - 30),
-        y: Math.random() * (canvas.height - 30),
-        size: 30
-    };
-
-    const keys = {};
-
-    document.addEventListener("keydown", e => keys[e.key] = true);
-    document.addEventListener("keyup", e => keys[e.key] = false);
-
-    function movePlayer() {
-        if(keys["ArrowUp"] || keys["w"] || keys["W"]) player.y -= player.speed;
-        if(keys["ArrowDown"] || keys["s"] || keys["S"]) player.y += player.speed;
-        if(keys["ArrowLeft"] || keys["a"] || keys["A"]) player.x -= player.speed;
-        if(keys["ArrowRight"] || keys["d"] || keys["D"]) player.x += player.speed;
-
-        // Limites do canvas
-        if(player.x < 0) player.x = 0;
-        if(player.y < 0) player.y = 0;
-        if(player.x > canvas.width - player.width) player.x = canvas.width - player.width;
-        if(player.y > canvas.height - player.height) player.y = canvas.height - player.height;
-    }
-
-    function collision() {
-        return (
-            player.x < trash.x + trash.size &&
-            player.x + player.width > trash.x &&
-            player.y < trash.y + trash.size &&
-            player.y + player.height > trash.y
-        );
-    }
-
-    function repositionTrash() {
-        trash.x = Math.random() * (canvas.width - trash.size);
-        trash.y = Math.random() * (canvas.height - trash.size);
-    }
-
-    function drawPlayer() {
-        ctx.fillStyle = "blue";
-        ctx.fillRect(player.x, player.y, player.width, player.height);
-    }
-
-    function drawTrash() {
-        ctx.fillStyle = "brown";
-        ctx.fillRect(trash.x, trash.y, trash.size, trash.size);
-    }
-
-    function update() {
-        movePlayer();
-
-        if(collision()) {
-            score++;
-            document.getElementById("score").textContent = "Pontuação: " + score;
-            repositionTrash();
-        }
-    }
-
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawPlayer();
-        drawTrash();
-    }
-
-    function gameLoop() {
-        if(time <= 0) {
-            alert("Fim de jogo! Sua pontuação foi: " + score);
-            return;
-        }
-        update();
-        draw();
-        requestAnimationFrame(gameLoop);
-    }
-
-    const timerInterval = setInterval(() => {
-        if(time > 0){
-            time--;
-            document.getElementById("timer").textContent = "Tempo: " + time;
-        } else {
-            clearInterval(timerInterval);
-        }
-    }, 1000);
-
-    gameLoop();
-
-};
-</script>
-
-</body>
-</html>
-
-
-
-
-
-    
-    
+    <script src="script.js"></script>
 </body>
 </html>
